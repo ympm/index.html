@@ -1,0 +1,186 @@
+<!-- TCSS 460 : Summer 2020 -->
+<!-- Assignment 3: fitness and health calculator -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assignment 3</title>
+    <!-- add a reference to the external stylesheet -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <!-- HTML code for displaying the navigation bar on the top -->
+    <nav class="navbar navbar-dark bg-primary mb-3">
+        <div class="container">
+            <a href="#" class="navbar-brand">Fitness and Health Calculator</a>
+        </div>
+    </nav>
+
+    <!-- HTML code for displaying the calculator container -->
+    <div class="container mainContainer">
+        <div class="mb-3">
+            <div class="card-header">Calculate: Body Mass Index (BMI), Body Fat, Ideal Weight, and Calories Burned.</div>
+            <div class="card-body">
+                <p class="h5"> What is your height in inches (in)?</p>
+                <input type="number" id = hgt class="form-control" placeholder="68">
+                <p class="h5"> What is your weight in pounds (lbs)?</p>
+                <input type="number" id = wgt class="form-control" placeholder="160">
+                <p class="h5"> What is your age in years?</p>
+                <input type="number" id = age class="form-control" placeholder="32">
+                <button type="submit" class="btn btn-primary" id="result">Result</button>
+            </div>
+        </div>
+    </div>
+        
+    <!-- Modal -->
+    <div class="modal   bd-example-modal-sm" id="infoDialog" tabindex="-1" role="dialog" aria-labelledby="infoDialog"
+        aria-hidden="true">
+        <div class="modal-dialog  modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title"></div>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-justify">
+                    <div class="card">
+                        <ul class="list-group">
+                            <li class="list-group-item" id="bmi"></li>
+                            <li class="list-group-item" id="bodyFat"></li>
+                            <li class="list-group-item" id="idealWeight"></li>
+                            <li class="list-group-item" id="caloriesBurned"></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <p id="footer-info"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        //listener for when button is clicked
+        $("#result").click(async function getResults() {
+            var height = $("#hgt").val();
+            var weight = $("#wgt").val();
+            var age = $("#age").val();
+            
+            //verifies a height, weight, and age is entered
+            if (height === "" || height == undefined || weight === "" || weight == undefined || age === "" || age == undefined)
+            {
+                alert("please enter a valid height, weight, and age.");
+            }
+            else
+            {
+                //Body Mass Index (BMI)
+                const bmiurl = `https://localhost:3000/bmi/${wgt}/${hgt}`;
+                console.log(bmiurl);
+                const bmiresponse = await fetch (bmiurl, {
+                    method: 'GET',
+                    cache: 'no-cache',
+                    mode: 'cors',
+                    credentials: 'same-origin'
+                });
+
+                if (bmiresponse.status != "200")
+                {
+                    alert("you have entered an invalid symbol");
+                    return;
+                }
+
+                const responseDatabmi = await bmiresponse.json();
+                console.log(responseDatabmi);
+
+
+                //Body Fat
+                const bodyFaturl = `https://localhost:3000/bodyfat/${age}/${responseDatabmi.bmi}`;
+                console.log(bodyFaturl);
+                const bodyFatResponse = await fetch (bodyFaturl, {
+                    mathod: 'GET',
+                    cache: 'no-cache',
+                    mode: 'cors',
+                    credentials: 'same-origin'
+                })
+
+                if (bodyFatResponse.status != "200")
+                {
+                    alert("you have entered an invalid symbol");
+                    return;
+                }
+
+                const responseDataBodyFat = await bodyFatResponse.json();
+                console.log(responseDataBodyFat);
+
+
+                //Ideal Weight
+                const idealWeighturl = `https://localhost:3000/idealweight/${hgt}}`;
+                console.log(idealWeighturl);
+                const idealWeightResponse = await fetch (idealWeighturl, {
+                    mathod: 'GET',
+                    cache: 'no-cache',
+                    mode: 'cors',
+                    credentials: 'same-origin'
+                })
+
+                if (idealWeightResponse.status != "200")
+                {
+                    alert("you have entered an invalid symbol");
+                    return;
+                }
+
+                const responseDataIdealWeight = await idealWeightResponse.json();
+                console.log(responseDataIdealWeight);
+
+
+                //Calories Burned
+                const caloriesBurnedurl = `https://localhost:3000/caloriesburned/${age}/${wgt}/${hgt}`;
+                console.log(caloriesBurnedurl);
+                const caloriesBurnedResponse = await fetch (caloriesBurnedurl, {
+                    mathod: 'GET',
+                    cache: 'no-cache',
+                    mode: 'cors',
+                    credentials: 'same-origin'
+                })
+
+                if (caloriesBurnedResponse.status != "200")
+                {
+                    alert("you have entered an invalid symbol");
+                    return;
+                }
+
+                const responseDataCaloriesBurned = await caloriesBurnedResponse.json();
+                console.log(responseDataCaloriesBurned);
+
+                infoDialog.style.display = "block";
+
+                //html for desired calculations
+                $('#bmi').html("BMI: " + responseDatabmi.bmi);
+                $('#bodyfat').html("Body Fat: " + responseDataBodyFat.bodyFat);
+                $('#idealWeight').html("Ideal Weight: " + responseDataIdealWeight.idealWeight);
+                $('#caloriesBurned').html("Calories Burned: " + responseDataCaloriesBurned.caloriesBurned);
+
+            }
+            
+        });
+    </script>
+
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+
+
+</body>
+
+</html>
